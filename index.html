@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trimestral — Análises Clínicas</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05080e;--bg2:#0b1019;--bg3:#111827;--bg4:#1a2235;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#e8edf5;--muted:#6b7d94;--muted2:#94a3b8;
+  --accent:#00d4ff;
+  --moco:#10d48e;--bioq:#f97316;--pgco:#f43f8e;--anpa:#a78bfa;
+  --cqlab:#00d4ff;--hema:#fb7185;--mivb:#34d399;--urfc:#fbbf24;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.75;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.3);border-radius:4px}
+#prog{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),#7c3aed,var(--pgco));z-index:999;width:0%}
+#c{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(5,8,14,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:52px;padding:0 20px;display:flex;align-items:center;gap:4px;overflow-x:auto}
+nav::-webkit-scrollbar{display:none}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:12px;color:var(--accent);white-space:nowrap;margin-right:8px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;flex-shrink:0}
+.nb{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);cursor:pointer;padding:4px 9px;border-radius:5px;white-space:nowrap;transition:all .18s;text-decoration:none;display:inline-block;border:none;background:none}
+.nb:hover{color:var(--text);background:var(--bg3)}
+.nb.active{color:var(--accent)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 24px 60px;position:relative;z-index:1;overflow:hidden}
+.hero-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 15% 35%,rgba(0,212,255,.07) 0%,transparent 65%),radial-gradient(ellipse 55% 45% at 85% 65%,rgba(124,58,237,.08) 0%,transparent 65%),radial-gradient(ellipse 40% 40% at 50% 80%,rgba(244,63,142,.04) 0%,transparent 60%)}
+.hero-badge{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.22);padding:5px 15px;border-radius:999px;margin-bottom:26px;display:inline-flex;align-items:center;gap:8px;opacity:0;animation:fadeUp .7s .1s ease forwards}
+.blink{animation:blink 1.2s infinite}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,8vw,6.5rem);font-weight:800;line-height:1.02;letter-spacing:-.03em;margin-bottom:18px;opacity:0;animation:fadeUp .7s .25s ease forwards}
+.l2{color:var(--accent);display:block}
+.l3{background:linear-gradient(135deg,var(--pgco),var(--anpa));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block}
+.hero-sub{color:var(--muted2);font-size:15px;max-width:480px;opacity:0;animation:fadeUp .7s .4s ease forwards;margin-bottom:36px}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:680px;opacity:0;animation:fadeUp .7s .55s ease forwards;margin-bottom:44px}
+.pill{font-size:11.5px;font-weight:500;padding:5px 13px;border-radius:999px;border:1px solid;cursor:pointer;transition:all .2s;text-decoration:none}
+.pill:hover{transform:translateY(-2px) scale(1.04)}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .7s .7s ease forwards}
+.btn-p{background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px;padding:11px 26px;border-radius:9px;text-decoration:none;transition:all .22s;display:inline-block}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(0,212,255,.35)}
+.btn-s{background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-family:'Syne',sans-serif;font-weight:600;font-size:13.5px;padding:11px 26px;border-radius:9px;text-decoration:none;transition:all .22s;display:inline-block}
+.btn-s:hover{transform:translateY(-2px);background:var(--bg4)}
+.scroll-arr{margin-top:52px;opacity:0;animation:fadeUp .7s .9s ease forwards;display:flex;flex-direction:column;align-items:center;gap:4px}
+.scroll-arr span{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-family:'Space Mono',monospace}
+.arrline{width:1px;height:52px;background:linear-gradient(to bottom,var(--accent),transparent);animation:arrowP 2s infinite}
+.stats-bar{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:28px 24px;display:flex;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.stat{text-align:center;padding:0 36px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;background:linear-gradient(135deg,var(--accent),var(--anpa));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-label{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+.sec{padding:88px 0;position:relative;z-index:1}
+.sec-label{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.sec-title{font-family:'Syne',sans-serif;font-size:clamp(1.7rem,4vw,2.9rem);font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.sec-sub{color:var(--muted2);margin-bottom:44px;max-width:580px;font-size:14px}
+.mega-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:14px;opacity:0;transform:translateY(28px);transition:opacity .6s,transform .6s,box-shadow .3s}
+.mega-card.vis{opacity:1;transform:translateY(0)}
+.mega-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.mc-head{display:flex;align-items:center;gap:10px;padding:22px 26px;cursor:pointer;user-select:none;transition:background .2s}
+.mc-head:hover{background:rgba(255,255,255,.02)}
+.mc-head h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;display:flex;align-items:center;gap:8px;flex:1}
+.mc-chev{color:var(--muted);font-size:12px;transition:transform .35s;flex-shrink:0}
+.mc-open .mc-chev{transform:rotate(180deg)}
+.mc-body{font-size:13.5px;color:#c0cdd8;line-height:1.8;max-height:0;overflow:hidden;transition:max-height .5s ease,padding .5s ease;padding:0 26px}
+.mc-open .mc-body{max-height:800px;padding:0 26px 22px}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.kw{font-weight:600;color:var(--text)}
+.subj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;text-decoration:none;display:block;transition:transform .28s,box-shadow .28s,border-color .28s;opacity:0;transform:translateY(24px)}
+.sc.vis{opacity:1;transform:translateY(0)}
+.sc:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(0,0,0,.5);border-color:var(--border2)}
+.sc-top{padding:20px 20px 14px;border-bottom:1px solid var(--border)}
+.sc-icon{font-size:26px;margin-bottom:8px;display:block}
+.sc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.93rem;margin-bottom:2px}
+.sc-code{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--muted)}
+.sc-body{padding:14px 20px 18px}
+.sc-body p{font-size:12.5px;color:var(--muted2);line-height:1.6}
+.sc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-size:9.5px;font-family:'Space Mono',monospace;padding:2px 7px;border-radius:4px;border:1px solid;opacity:.75}
+.subj-sec{border-top:1px solid var(--border);padding:72px 0;position:relative;z-index:1}
+.subj-head{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:38px}
+.subj-ico{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.subj-head-text h2{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:800;letter-spacing:-.02em}
+.subj-head-text p{color:var(--muted2);font-size:13px;margin-top:3px}
+.topic-grid{display:grid;gap:14px}
+.tc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid;border-radius:12px;padding:20px 22px;opacity:0;transform:translateX(-18px);transition:opacity .55s,transform .55s,box-shadow .25s}
+.tc.vis{opacity:1;transform:translateX(0)}
+.tc:hover{box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.tc h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;margin-bottom:10px}
+.tc ul{list-style:none}
+.tc ul li{font-size:13.5px;color:#b8c8d8;padding:3.5px 0 3.5px 18px;position:relative;line-height:1.65}
+.tc ul li::before{content:'›';position:absolute;left:0;color:var(--muted);font-weight:700}
+.tc ul li strong{color:var(--text);font-weight:600}
+.badge{display:inline-block;font-size:10px;font-family:'Space Mono',monospace;padding:1px 7px;border-radius:4px;margin-left:5px;vertical-align:middle}
+.bb{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:var(--accent)}
+.bo{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.22);color:#f97316}
+.br{background:rgba(244,63,142,.1);border:1px solid rgba(244,63,142,.22);color:var(--pgco)}
+.bg{background:rgba(16,212,142,.1);border:1px solid rgba(16,212,142,.22);color:var(--moco)}
+.diagram{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--muted2);line-height:1.9;white-space:pre-wrap;overflow-x:auto}
+.da{color:var(--accent)}.dg{color:var(--moco)}.do{color:var(--bioq)}.dr{color:var(--pgco)}.dy{color:var(--urfc)}
+.ctable{width:100%;border-collapse:collapse;margin-top:12px}
+.ctable th{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--bg3);padding:9px 12px;border:1px solid var(--border);text-align:left}
+.ctable td{padding:9px 12px;border:1px solid var(--border);font-size:13px;vertical-align:top;color:#c0ccd8}
+.ctable tr:hover td{background:rgba(255,255,255,.02)}
+.timeline{position:relative;padding-left:28px;margin-top:14px}
+.timeline::before{content:'';position:absolute;left:0;top:8px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--urfc),transparent)}
+.tl-step{position:relative;margin-bottom:18px}
+.tl-step::before{content:'';position:absolute;left:-32px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--urfc);border:2px solid var(--bg);box-shadow:0 0 0 3px rgba(251,191,36,.25)}
+.tl-num{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--urfc);letter-spacing:.1em;margin-bottom:2px}
+.tl-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;margin-bottom:3px}
+.tl-desc{font-size:13px;color:var(--muted2)}
+/* Néfron visual */
+.nefron-diagram{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.nef-part{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.nef-part .np-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:6px}
+.nef-part .np-desc{font-size:12.5px;color:var(--muted2);line-height:1.55}
+/* Marcadores */
+.marker-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:14px}
+.mc2{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.mc2 .mv{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px}
+.mc2 .ml{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.mc2 .md{font-size:12.5px;color:var(--muted2);margin-top:6px;line-height:1.5}
+/* Exames urina */
+.exam-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.etab{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.etab-icon{font-size:22px;margin-bottom:6px}
+.etab-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:6px}
+.etab-desc{font-size:12px;color:var(--muted2);line-height:1.5}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:20px}
+.fc-wrap{perspective:1000px;min-height:190px}
+.fc{width:100%;height:100%;min-height:190px;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.fc.flipped{transform:rotateY(180deg)}
+.fc-front,.fc-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:22px;border:1px solid}
+.fc-front{background:var(--bg2)}
+.fc-back{background:var(--bg3);transform:rotateY(180deg)}
+.fc-q{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;line-height:1.4}
+.fc-a{font-size:13px;color:#c8d8e8;line-height:1.65}
+.fc-hint{font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);margin-top:10px;letter-spacing:.1em}
+.cheat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.ci{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:13px 15px;transition:all .2s;opacity:0;transform:scale(.95)}
+.ci.vis{opacity:1;transform:scale(1)}
+.ci:hover{border-color:var(--border2);transform:scale(1.02);background:var(--bg3)}
+.ci .lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.ci .val{font-size:13px;color:var(--text);font-weight:500}
+.ci .val span{opacity:.65;font-weight:400}
+.review-box{background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(124,58,237,.04));border:1px solid rgba(0,212,255,.14);border-radius:16px;padding:30px 32px;margin-top:44px}
+.review-box h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--accent);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.rl{list-style:none;display:grid;gap:9px}
+.rl li{background:var(--bg3);border-radius:8px;padding:11px 15px;font-size:13.5px;display:flex;align-items:flex-start;gap:10px;border-left:2px solid rgba(0,212,255,.25);opacity:0;transform:translateX(-12px);transition:opacity .5s,transform .5s}
+.rl li.vis{opacity:1;transform:translateX(0)}
+#btt{position:fixed;bottom:24px;right:24px;z-index:300;width:42px;height:42px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--accent);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(12px);pointer-events:none;transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+#btt.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#btt:hover{background:var(--bg4);transform:translateY(-2px)}
+.divider{height:1px;width:100%;background:linear-gradient(90deg,transparent,var(--border2),transparent);position:relative;z-index:1}
+footer{text-align:center;padding:44px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:11.5px;font-family:'Space Mono',monospace;position:relative;z-index:1}
+.footer-glow{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:0 auto 16px}
+/* NEW: flow diagram */
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-top:14px;justify-content:center}
+.flow-step{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1}
+.flow-step .fs-num{font-family:'Space Mono',monospace;font-size:9px;color:var(--urfc);letter-spacing:.1em;margin-bottom:4px}
+.flow-step .fs-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:4px}
+.flow-step .fs-desc{font-size:11.5px;color:var(--muted2)}
+.flow-arrow{font-size:18px;color:var(--muted);padding:0 4px;flex-shrink:0}
+/* highlight box */
+.hbox{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:13.5px;color:#c8d8e8}
+.hbox strong{color:var(--urfc)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.5)}70%{box-shadow:0 0 0 7px rgba(0,212,255,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes arrowP{0%,100%{opacity:.7;transform:scaleY(1)}50%{opacity:.3;transform:scaleY(.7)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media(max-width:640px){
+  .stats-bar{flex-direction:column}
+  .stat{border-right:none;border-bottom:1px solid var(--border);padding:14px 0}
+  .stat:last-child{border-bottom:none}
+  .nefron-diagram{grid-template-columns:1fr}
+  .exam-tabs{grid-template-columns:1fr}
+  .flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+  .ctable th,.ctable td{padding:7px 9px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<canvas id="c"></canvas>
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<nav>
+  <div class="nav-logo"><div class="pdot"></div>⚗️ AC · Trimestral</div>
+  <a href="#resumao" class="nb">📋 Resumão</a>
+  <a href="#materias" class="nb">📚 Matérias</a>
+  <a href="#moco" class="nb">🔬 MOCO</a>
+  <a href="#bioq" class="nb">🧪 BIOQ</a>
+  <a href="#pgco" class="nb">🧫 PGCO</a>
+  <a href="#anpa" class="nb">🔪 ANPA</a>
+  <a href="#cqlab" class="nb">📋 CQLAB</a>
+  <a href="#hema" class="nb">🩸 HEMA</a>
+  <a href="#mivb" class="nb">🦠 MIVB</a>
+  <a href="#urfc" class="nb">💧 URFC</a>
+  <a href="#flash" class="nb">🃏 Cards</a>
+  <a href="#cheat" class="nb">⚡ Cola</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><span class="blink">●</span> ATUALIZADO com seus cadernos · Prova amanhã · Vai bem!</div>
+  <h1>Análises<span class="l2">Clínicas</span><span class="l3">Trimestral</span></h1>
+  <p class="hero-sub">Conteúdo dos seus cadernos + resumo completo — organizado, animado e pronto pra fixar agora.</p>
+  <div class="pill-row">
+    <a href="#moco" class="pill" style="color:var(--moco);border-color:var(--moco);background:rgba(16,212,142,.07)">🔬 MOCO</a>
+    <a href="#bioq" class="pill" style="color:var(--bioq);border-color:var(--bioq);background:rgba(249,115,22,.07)">🧪 BIOQ</a>
+    <a href="#pgco" class="pill" style="color:var(--pgco);border-color:var(--pgco);background:rgba(244,63,142,.07)">🧫 PGCO</a>
+    <a href="#anpa" class="pill" style="color:var(--anpa);border-color:var(--anpa);background:rgba(167,139,250,.07)">🔪 ANPA</a>
+    <a href="#cqlab" class="pill" style="color:var(--cqlab);border-color:var(--cqlab);background:rgba(0,212,255,.07)">📋 CQLAB</a>
+    <a href="#hema" class="pill" style="color:var(--hema);border-color:var(--hema);background:rgba(251,113,133,.07)">🩸 HEMA</a>
+    <a href="#mivb" class="pill" style="color:var(--mivb);border-color:var(--mivb);background:rgba(52,211,153,.07)">🦠 MIVB</a>
+    <a href="#urfc" class="pill" style="color:var(--urfc);border-color:var(--urfc);background:rgba(251,191,36,.07)">💧 URFC</a>
+  </div>
+  <div class="hero-btns">
+    <a href="#resumao" class="btn-p">Ver Resumão Geral →</a>
+    <a href="#urfc" class="btn-s">💧 URFC Atualizada</a>
+    <a href="#flash" class="btn-s">🃏 Flashcards</a>
+  </div>
+  <div class="scroll-arr"><div class="arrline"></div><span>role para baixo</span></div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" data-target="8">0</div><div class="stat-label">Matérias</div></div>
+  <div class="stat"><div class="stat-num" data-target="50">0</div><div class="stat-label">Tópicos</div></div>
+  <div class="stat"><div class="stat-num" data-target="18">0</div><div class="stat-label">Flashcards</div></div>
+  <div class="stat"><div class="stat-num" data-target="26">0</div><div class="stat-label">Macetes</div></div>
+</div>
+
+<!-- ══ RESUMÃO ══ -->
+<section class="sec" id="resumao">
+<div class="wrap">
+<div class="sec-label">Visão Geral Consolidada</div>
+<div class="sec-title">🧠 Resumão — O essencial de cada matéria</div>
+<p class="sec-sub">Cards expansíveis com o resumo de cada disciplina. Clique para abrir.</p>
+
+<div class="mega-card mc-open" style="border-left:3px solid var(--moco)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--moco)"></span>🔬 MOCO — Morfofisiologia Comparada</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p><span class="kw">Planos:</span> Sagital Mediano (esq/dir) · Transversal (cranial/caudal) · Dorsal (costas/barriga). <span class="kw">Termos:</span> Rostral=nariz (só na cabeça); Proximal/Distal nos membros; Palmar=pata dianteira; Plantar=pata traseira. <span class="kw">Tegumento:</span> Epiderme (basal→queratinização→córneo) · Derme (vascularizada) · Hipoderme (gordura). Funções: barreira, termorregulação, excreção, sensorial. <span class="kw">Anexos:</span> Gl. sebáceas (sebo+feromônios) · Gl. sudoríparas nos coxins · Vibrissas (pelos táteis) · Garras (queratina viva).</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--bioq)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--bioq)"></span>🧪 BIOQ — Bioquímica Básica</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p><span class="kw">Carboidratos:</span> Monossacarídeos (Gli/Fru/Gal) → Aldoses/Cetoses. Dissacarídeos: Sacarose=Gli+Fru · Lactose=Gli+Gal · Maltose=Gli+Gli. Polissacarídeos: reserva (Amido/Glicogênio) · estruturais (Celulose/Quitina). <span class="kw">Digestão:</span> boca (alfa-amilase) → estômago (pausa, pH ácido) → intestino (amilase pancreática+enzimas). <span class="kw">Glicólise:</span> citosol · 1Gli→2Pir · Investimento(−2ATP, PFK-1) · Compensação(+4ATP+2NADH) · Saldo=2ATP. Insulina=ativa; Glucagon=inibe. <span class="kw">Piruvato:</span> aeróbico→Krebs · láctica→lactato · alcoólica→etanol.</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--pgco)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--pgco)"></span>🧫 PGCO — Patologia Geral</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p><span class="kw">Etiologia</span>=causa · <span class="kw">Patogenia</span>=mecanismo. Lesão: Hipóxia+Radicais Livres. <span class="kw">Adaptações:</span> Hipertrofia(↑tam) · Hiperplasia(↑num) · Atrofia(↓tam) · Metaplasia(troca tipo celular). <span class="kw">Morte:</span> NECROSE="suja", rompe membrana, inflamação severa · APOPTOSE="limpa", programada, SEM inflamação. <span class="kw">Inflamação—5 sinais:</span> Calor·Rubor·Tumor·Dor·Perda de Função. Aguda=Neutrófilos; Crônica=Macrófagos+Linfócitos+Granulomas.</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--anpa)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--anpa)"></span>🔪 ANPA — Anatomia Patológica</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p><span class="kw">Áreas:</span> Citopatologia · Histopatologia · Imunohistoquímica · Necropsia. <span class="kw">Processamento (6 etapas):</span> Fixação Formol 10% (MAIS CRÍTICA) → Clivagem → Processamento (álcool→xilol) → Inclusão parafina → Microtomia → Coloração HE. <span class="kw">HE:</span> Hematoxilina=NÚCLEO roxo/azul · Eosina=CITOPLASMA rosa. <span class="kw">Papanicolau:</span> álcool 95%. HPV→Coilocitose (halo perinuclear+núcleo deslocado)=PATOGNOMÔNICO.</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--cqlab)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--cqlab)"></span>📋 CQLAB — Controle de Qualidade</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p><span class="kw">POP</span>=reprodutibilidade independente do executor. <span class="kw">70% das falhas na Fase Pré-Analítica</span> (cadastro errado, jejum, tubo errado, identificação). Conferir: Lote·Validade·Temperatura. <span class="kw">Equipe:</span> RT=responsabilidade legal · Técnico=flebotomia+ensaios · Auxiliar=higiene · Recepcionista=sigilo+identificação.</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--hema)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--hema)"></span>🩸 HEMA/IMBA — Hematologia e Imunologia</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p>Sangue: 55% plasma+45% elementos figurados. <span class="kw">Tubos:</span> Roxo=EDTA (hemograma) · Azul=Citrato (coagulação). <span class="kw">Eritrograma:</span> Hb=anemia; VCM=tamanho; HCM/CHCM=cor. <span class="kw">Leucograma:</span> Neutrofilia+Desvio à Esquerda=infecção bacteriana grave · Linfocitose=viral · Eosinofilia=alergia/parasita. <span class="kw">Plaquetograma:</span> Plaquetopenia=hemorragia · Plaquetose=trombose.</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--mivb)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--mivb)"></span>🦠 MIVB — Microbiologia</h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p>Procariontes=sem carioteca. <span class="kw">Estrutura:</span> citoplasma · nucleoide (DNA circular) · ribossomos 70S · <span class="kw">parede peptideoglicano</span> (ALVO DOS ANTIBIÓTICOS) · cápsula (foge fagocitose) · flagelos · fímbrias. Formas: Cocos·Bacilos·Espirilos. <span class="kw">Microbiota:</span> exclusão competitiva · vitaminas K e B · modula imunidade · digere fibras. Desequilíbrio=Disbiose.</p></div>
+</div>
+
+<div class="mega-card" style="border-left:3px solid var(--urfc)">
+  <div class="mc-head" onclick="toggleMC(this)"><h3><span class="dot" style="background:var(--urfc)"></span>💧 URFC — Urinálise e Fluidos <span style="font-size:.8rem;color:var(--urfc);opacity:.7">(conteúdo do caderno integrado!)</span></h3><span class="mc-chev">▼</span></div>
+  <div class="mc-body"><p><span class="kw">URFC</span>=estudo laboratorial da urina e fluidos corporais. Importância clínica: diagnóstico de patologias renais. <span class="kw">Sistema urinário:</span> 2 Rins · 2 Ureteres · 1 Bexiga · 1 Uretra. Unidade funcional=<span class="kw">NÉFRON</span> (~1 milhão/rim). Além de excretor: papel endócrino (PA, eritropoiese, metabolismo do cálcio). <span class="kw">Formação da urina (3 processos):</span> (1) Filtração glomerular: TFG≈125mL/min, depende da pressão hidrostática e oncótica · (2) Reabsorção tubular: TCP reabsorve o necessário; Alça de Henle concentra a urina · (3) Secreção tubular: ducto coletor regula por hormônios, elimina amônia/fármacos. Volume final=1–2 L/dia. <span class="kw">Marcadores renais:</span> Ureia (10–50mg/dL, metabolismo proteico) · Creatinina (metabolismo muscular) · TFG. <span class="kw">Exame de urina:</span> físico (cor, aspecto, volume, densidade) · químico (tiras reagentes) · microscópico (sedimentoscopia). Coleta: 1ª urina manhã + jato médio · processar em 2h.</p></div>
+</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ CARDS MATÉRIAS ══ -->
+<section class="sec" id="materias">
+<div class="wrap">
+<div class="sec-label">Navegação por Disciplina</div>
+<div class="sec-title">📚 Todas as Matérias</div>
+<p class="sec-sub">Clique para ir ao conteúdo detalhado.</p>
+<div class="subj-grid">
+  <a href="#moco" class="sc"><div class="sc-top"><span class="sc-icon">🔬</span><div class="sc-name" style="color:var(--moco)">Morfofisiologia Comparada</div><div class="sc-code">MOCO</div></div><div class="sc-body"><p>Planos anatômicos, tegumento e estruturas anexas.</p><div class="sc-tags"><span class="tag" style="color:var(--moco);border-color:var(--moco)">Anatomia</span><span class="tag" style="color:var(--moco);border-color:var(--moco)">Tegumento</span></div></div></a>
+  <a href="#bioq" class="sc"><div class="sc-top"><span class="sc-icon">🧪</span><div class="sc-name" style="color:var(--bioq)">Bioquímica Básica</div><div class="sc-code">BIOQ</div></div><div class="sc-body"><p>Carboidratos, digestão e metabolismo energético.</p><div class="sc-tags"><span class="tag" style="color:var(--bioq);border-color:var(--bioq)">Glicólise</span><span class="tag" style="color:var(--bioq);border-color:var(--bioq)">ATP</span></div></div></a>
+  <a href="#pgco" class="sc"><div class="sc-top"><span class="sc-icon">🧫</span><div class="sc-name" style="color:var(--pgco)">Patologia Geral</div><div class="sc-code">PGCO</div></div><div class="sc-body"><p>Lesão celular, adaptações e inflamação.</p><div class="sc-tags"><span class="tag" style="color:var(--pgco);border-color:var(--pgco)">Necrose</span><span class="tag" style="color:var(--pgco);border-color:var(--pgco)">Apoptose</span></div></div></a>
+  <a href="#anpa" class="sc"><div class="sc-top"><span class="sc-icon">🔪</span><div class="sc-name" style="color:var(--anpa)">Anatomia Patológica</div><div class="sc-code">ANPA</div></div><div class="sc-body"><p>Processamento histológico, HE e HPV.</p><div class="sc-tags"><span class="tag" style="color:var(--anpa);border-color:var(--anpa)">HE</span><span class="tag" style="color:var(--anpa);border-color:var(--anpa)">Coilocitose</span></div></div></a>
+  <a href="#cqlab" class="sc"><div class="sc-top"><span class="sc-icon">📋</span><div class="sc-name" style="color:var(--cqlab)">Controle de Qualidade</div><div class="sc-code">CQLAB</div></div><div class="sc-body"><p>POP, fases analíticas, reagentes e equipe.</p><div class="sc-tags"><span class="tag" style="color:var(--cqlab);border-color:var(--cqlab)">POP</span><span class="tag" style="color:var(--cqlab);border-color:var(--cqlab)">Pré-Analítica</span></div></div></a>
+  <a href="#hema" class="sc"><div class="sc-top"><span class="sc-icon">🩸</span><div class="sc-name" style="color:var(--hema)">Hematologia / Imunologia</div><div class="sc-code">HEMA · IMBA</div></div><div class="sc-body"><p>Composição sanguínea, tubos e hemograma.</p><div class="sc-tags"><span class="tag" style="color:var(--hema);border-color:var(--hema)">Leucograma</span><span class="tag" style="color:var(--hema);border-color:var(--hema)">EDTA</span></div></div></a>
+  <a href="#mivb" class="sc"><div class="sc-top"><span class="sc-icon">🦠</span><div class="sc-name" style="color:var(--mivb)">Microbiologia e Virologia</div><div class="sc-code">MIVB</div></div><div class="sc-body"><p>Estrutura bacteriana, microbiota e disbiose.</p><div class="sc-tags"><span class="tag" style="color:var(--mivb);border-color:var(--mivb)">Bactérias</span><span class="tag" style="color:var(--mivb);border-color:var(--mivb)">Peptideoglicano</span></div></div></a>
+  <a href="#urfc" class="sc" style="border-color:rgba(251,191,36,.3)"><div class="sc-top"><span class="sc-icon">💧</span><div class="sc-name" style="color:var(--urfc)">Urinálise e Fluidos ✨</div><div class="sc-code">URFC — CADERNO INTEGRADO</div></div><div class="sc-body"><p>Anatomia renal, néfron completo, TFG, marcadores renais e exames.</p><div class="sc-tags"><span class="tag" style="color:var(--urfc);border-color:var(--urfc)">Néfron</span><span class="tag" style="color:var(--urfc);border-color:var(--urfc)">TFG</span><span class="tag" style="color:var(--urfc);border-color:var(--urfc)">Ureia</span><span class="tag" style="color:var(--urfc);border-color:var(--urfc)">Creatinina</span></div></div></a>
+</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ MOCO ══ -->
+<div class="subj-sec" id="moco">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(16,212,142,.12)">🔬</div>
+  <div class="subj-head-text"><h2 style="color:var(--moco)">Morfofisiologia Comparada</h2><p>Planos · Termos de direção · Tegumento · Estruturas Anexas</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--moco)">
+    <h4>🗺️ Planos Anatômicos + Termos de Direção</h4>
+    <ul>
+      <li><strong>Sagital Mediano:</strong> longitudinal → metades esq. e dir. simétricas</li>
+      <li><strong>Transversal:</strong> perpendicular ao eixo → Cranial (cabeça) vs Caudal (cauda)</li>
+      <li><strong>Dorsal (Frontal):</strong> dorsal (costas) vs ventral (barriga)</li>
+      <li><strong>Rostral:</strong> direção ao nariz <span class="badge br">só na cabeça!</span></li>
+      <li><strong>Proximal / Distal:</strong> perto / longe do corpo (membros)</li>
+      <li><strong>Palmar:</strong> pata dianteira <span class="badge bb">como palma</span></li>
+      <li><strong>Plantar:</strong> pata traseira <span class="badge bb">como planta do pé</span></li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--moco)">
+    <h4>🧴 Tegumento — Camadas e Funções</h4>
+    <ul>
+      <li><strong>Epiderme (avascular):</strong> basal (mitose) → granuloso → espinhoso → córneo (células mortas)</li>
+      <li><strong>Derme:</strong> vascularizada, nervos, glândulas, folículos</li>
+      <li><strong>Hipoderme:</strong> adiposo + conjuntivo (isolamento e reserva)</li>
+      <li>🛡️ Proteção · 🌡️ Termorregulação · 💧 Excreção · 👆 Sensorial</li>
+      <li><strong>Gl. sebáceas →</strong> sebo + feromônios</li>
+      <li><strong>Gl. sudoríparas →</strong> coxins (cão/gato), inclui mamárias</li>
+      <li><strong>Vibrissas →</strong> pelos táteis altamente inervados</li>
+      <li><strong>Garras →</strong> queratina dura, estrutura viva</li>
+    </ul>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ BIOQ ══ -->
+<div class="subj-sec" id="bioq">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(249,115,22,.12)">🧪</div>
+  <div class="subj-head-text"><h2 style="color:var(--bioq)">Bioquímica Básica</h2><p>Carboidratos · Digestão · Glicólise · Piruvato</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--bioq)">
+    <h4>🍬 Carboidratos</h4>
+    <ul>
+      <li><strong>Mono:</strong> Gli, Fru, Gal → Aldoses (aldeído) / Cetoses (cetona)</li>
+      <li><strong>Dissacarídeos:</strong> Sacarose=Gli+Fru · Lactose=Gli+Gal <span class="badge br">cai muito!</span> · Maltose=Gli+Gli</li>
+      <li><strong>Polissacarídeos reserva:</strong> Amido (planta) · Glicogênio (fígado+músculo)</li>
+      <li><strong>Polissacarídeos estruturais:</strong> Celulose · Quitina</li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--bioq)">
+    <h4>⚡ Glicólise</h4>
+    <ul>
+      <li>Local: <strong>Citosol</strong> <span class="badge br">NÃO mitocôndria!</span></li>
+      <li>1 Glicose (6C) → 2 Piruvato (3C)</li>
+      <li><strong>Investimento (1–5):</strong> −2 ATP · enzima-chave = <strong>PFK-1</strong> <span class="badge br">+ cobrada</span></li>
+      <li><strong>Compensação (6–10):</strong> +4 ATP + 2 NADH · <strong>Saldo = 2 ATP</strong></li>
+      <li>Insulina=ativa · Glucagon=inibe</li>
+    </ul>
+    <div class="diagram"><span class="da">GLICOSE</span> → [−2 ATP, PFK-1] → <span class="do">2×Gliceraldeído-3P</span>
+→ [+4 ATP +2 NADH] → <span class="dg">2×PIRUVATO</span>
+Saldo líquido = <span class="da">+2 ATP</span> no citosol</div>
+  </div>
+  <div class="tc" style="border-color:var(--bioq)">
+    <h4>🔀 Destinos do Piruvato</h4>
+    <table class="ctable">
+      <tr><th>Condição</th><th>Via</th><th>Produto</th></tr>
+      <tr><td>Com O₂</td><td>Ciclo de Krebs</td><td>CO₂ + H₂O + ATP</td></tr>
+      <tr><td>Sem O₂ — Láctica</td><td>Fermentação</td><td><strong>Lactato</strong> (músculo)</td></tr>
+      <tr><td>Sem O₂ — Alcoólica</td><td>Fermentação</td><td><strong>Etanol</strong> + CO₂</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ PGCO ══ -->
+<div class="subj-sec" id="pgco">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(244,63,142,.12)">🧫</div>
+  <div class="subj-head-text"><h2 style="color:var(--pgco)">Patologia Geral</h2><p>Etiologia · Adaptação · Morte Celular · Inflamação</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--pgco)">
+    <h4>📖 Conceitos + Adaptações</h4>
+    <ul>
+      <li><strong>Etiologia</strong>=causa · <strong>Patogenia</strong>=mecanismo</li>
+      <li>Lesão: <strong>Hipóxia</strong> + <strong>Radicais Livres</strong></li>
+      <li><strong>Hipertrofia</strong> (↑tam) · <strong>Hiperplasia</strong> (↑num) · <strong>Atrofia</strong> (↓tam) · <strong>Metaplasia</strong> (troca tipo)</li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--pgco)">
+    <h4>💀 Necrose vs Apoptose — Diferença crítica</h4>
+    <table class="ctable">
+      <tr><th></th><th>🔴 NECROSE</th><th>🟢 APOPTOSE</th></tr>
+      <tr><td>Tipo</td><td>Patológica</td><td>Programada</td></tr>
+      <tr><td>Membrana</td><td><strong>ROMPE</strong></td><td>Intacta → corpos apoptóticos</td></tr>
+      <tr><td>Inflamação</td><td><strong>SIM</strong> (severa)</td><td><strong>NÃO</strong></td></tr>
+      <tr><td>Apelido</td><td>"Suja"</td><td>"Limpa"</td></tr>
+    </table>
+  </div>
+  <div class="tc" style="border-color:var(--pgco)">
+    <h4>🔥 Inflamação</h4>
+    <ul>
+      <li><strong>5 sinais cardinais:</strong> Calor · Rubor · Tumor(edema) · Dor · Perda de Função</li>
+      <li><strong>Aguda:</strong> Neutrófilos + vasodilatação + exsudato</li>
+      <li><strong>Crônica:</strong> Macrófagos + Linfócitos + Granulomas</li>
+    </ul>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ ANPA ══ -->
+<div class="subj-sec" id="anpa">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(167,139,250,.12)">🔪</div>
+  <div class="subj-head-text"><h2 style="color:var(--anpa)">Anatomia Patológica</h2><p>Processamento histológico · HE · Papanicolau · HPV</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--anpa)">
+    <h4>🧱 Processamento Histológico — 6 Etapas</h4>
+    <ul>
+      <li><strong>1. Fixação Formol 10%</strong> <span class="badge br">MAIS CRÍTICA!</span> — interrompe autólise imediatamente</li>
+      <li><strong>2. Clivagem</strong> — análise macroscópica, seleção de áreas</li>
+      <li><strong>3. Processamento</strong> — álcool (desidratação) → xilol (diafanização)</li>
+      <li><strong>4. Inclusão</strong> — bloco de parafina rígido</li>
+      <li><strong>5. Microtomia</strong> — cortes de 3–5µm no micrótomo</li>
+      <li><strong>6. Coloração HE</strong> — técnica padrão universal</li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--anpa)">
+    <h4>🎨 HE + Papanicolau + HPV</h4>
+    <ul>
+      <li><strong>Hematoxilina → NÚCLEO = ROXO/AZUL</strong> <span class="badge br">+ cobrado!</span></li>
+      <li><strong>Eosina → CITOPLASMA = ROSA/VERMELHO</strong></li>
+      <li>Papanicolau: fixação com <strong>álcool 95%</strong></li>
+      <li>HPV → queratinócitos → efeito patognomônico: <strong>COILOCITOSE</strong></li>
+      <li>Coilocitose = halo perinuclear claro + núcleo hipercromático deslocado</li>
+    </ul>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ CQLAB ══ -->
+<div class="subj-sec" id="cqlab">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(0,212,255,.10)">📋</div>
+  <div class="subj-head-text"><h2 style="color:var(--cqlab)">Controle de Qualidade</h2><p>POP · Fases · Reagentes · Equipe</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--cqlab)">
+    <h4>📄 Documentação e Fases</h4>
+    <ul>
+      <li><strong>POP:</strong> garante reprodutibilidade independente do executor</li>
+      <li><strong>Manual de Qualidade:</strong> políticas gerais · <strong>Registros:</strong> evidências de execução</li>
+      <li><strong>70% das falhas na Fase PRÉ-ANALÍTICA</strong> <span class="badge br">fundamental!</span></li>
+      <li>→ Erros: cadastro, jejum, tubo errado, identificação, transporte</li>
+      <li>Conferir sempre: <strong>Lote · Validade · Temperatura</strong></li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--cqlab)">
+    <h4>👥 Equipe Laboratorial</h4>
+    <table class="ctable">
+      <tr><th>Cargo</th><th>Função</th></tr>
+      <tr><td><strong>RT</strong></td><td>Responsabilidade LEGAL dos laudos</td></tr>
+      <tr><td><strong>Técnico em AC</strong></td><td>Flebotomia + ensaios</td></tr>
+      <tr><td><strong>Auxiliar</strong></td><td>Higienização</td></tr>
+      <tr><td><strong>Recepcionista</strong></td><td>Sigilo + identificação</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ HEMA ══ -->
+<div class="subj-sec" id="hema">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(251,113,133,.12)">🩸</div>
+  <div class="subj-head-text"><h2 style="color:var(--hema)">Hematologia / Imunologia</h2><p>Composição · Tubos · Eritrograma · Leucograma · Plaquetas</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--hema)">
+    <h4>🩺 Sangue e Tubos</h4>
+    <ul>
+      <li>55% Plasma + 45% Elementos Figurados (Eritrócitos, Leucócitos, Plaquetas)</li>
+      <li><strong>Tubo ROXO = EDTA →</strong> Hemograma <span class="badge br">não inverter!</span></li>
+      <li><strong>Tubo AZUL = Citrato →</strong> Coagulação (PT, APTT, INR)</li>
+      <li><strong>Tubo VERMELHO/AMARELO</strong> = soro para bioquímica</li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--hema)">
+    <h4>🔴 Eritrograma + 🟡 Plaquetograma</h4>
+    <ul>
+      <li><strong>Hb</strong>=anemia (♀&lt;12; ♂&lt;13 g/dL) · <strong>VCM</strong>=tamanho · <strong>HCM/CHCM</strong>=cor</li>
+      <li>Microcítica=ferropriva · Macrocítica=B12/folato · Hipocrômica=ferropriva</li>
+      <li><strong>Plaquetopenia(↓)</strong>=hemorragia · <strong>Plaquetose(↑)</strong>=trombose</li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--hema)">
+    <h4>⬜ Leucograma — Leitura Rápida</h4>
+    <ul>
+      <li><strong>Neutrofilia + Desvio à Esquerda</strong> = infecção bacteriana GRAVE <span class="badge br">+ cobrado!</span></li>
+      <li><strong>Linfocitose</strong> = infecção viral</li>
+      <li><strong>Eosinofilia</strong> = alergia ou parasitose</li>
+      <li><strong>Monocitose</strong> = crônica/recuperação</li>
+    </ul>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══ MIVB ══ -->
+<div class="subj-sec" id="mivb">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(52,211,153,.10)">🦠</div>
+  <div class="subj-head-text"><h2 style="color:var(--mivb)">Microbiologia e Virologia</h2><p>Estrutura bacteriana · Gram · Microbiota · Disbiose</p></div>
+</div>
+<div class="topic-grid">
+  <div class="tc" style="border-color:var(--mivb)">
+    <h4>🔬 Estrutura Bacteriana</h4>
+    <ul>
+      <li>Procariontes: SEM carioteca · SEM organelas membranosas</li>
+      <li>DNA circular (nucleoide) · Ribossomos 70S</li>
+      <li><strong>Parede de Peptideoglicano → ALVO DOS ANTIBIÓTICOS</strong> <span class="badge br">+ cobrado!</span></li>
+      <li>Cápsula (foge fagocitose) · Flagelos (locomoção) · Fímbrias (adesão)</li>
+      <li>Gram+: parede espessa → VIOLETA · Gram−: parede fina+membrana externa → ROSA</li>
+      <li>Formas: Cocos · Bacilos · Espirilos</li>
+    </ul>
+  </div>
+  <div class="tc" style="border-color:var(--mivb)">
+    <h4>🌱 Microbiota e Disbiose</h4>
+    <ul>
+      <li><strong>Exclusão competitiva:</strong> ocupa nichos, impede patógenos</li>
+      <li>Produz vitaminas K e Complexo B</li>
+      <li>Modula imunidade · Digere fibras complexas</li>
+      <li><strong>Disbiose:</strong> desequilíbrio → doenças, inflamação</li>
+    </ul>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ══════════ URFC COMPLETA (CADERNO) ══════════ -->
+<div class="subj-sec" id="urfc" style="border-top:2px solid var(--urfc)">
+<div class="wrap">
+<div class="subj-head">
+  <div class="subj-ico" style="background:rgba(251,191,36,.15);animation:float 3s ease-in-out infinite">💧</div>
+  <div class="subj-head-text">
+    <h2 style="color:var(--urfc)">Urinálise e Fluidos Corporais <span style="font-size:.7em;opacity:.7">✨ Caderno integrado</span></h2>
+    <p>Sistema urinário · Néfron completo · TFG · Formação da urina · Exames · Marcadores renais</p>
+  </div>
+</div>
+
+<!-- Introdução -->
+<div class="topic-grid">
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>📌 O que é URFC + Importância Clínica</h4>
+  <ul>
+    <li><strong>URFC</strong> = Urinálise e Fluidos Corporais = estudo laboratorial da urina</li>
+    <li>Importância: diagnóstico de patologias renais e avaliação do funcionamento dos rins</li>
+    <li>Além da urina: outros fluidos corporais incluem LCR (Líquido Cefalorraquidiano) e Líquidos Serosos (Pleural)</li>
+  </ul>
+</div>
+
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>🫘 Sistema Urinário — Anatomia Completa</h4>
+  <ul>
+    <li><strong>2 Rins:</strong> órgãos pares retroperitoneais — filtram o sangue · contêm ~1 milhão de néfrons cada</li>
+    <li><strong>2 Ureteres:</strong> conduzem a urina do rim à bexiga</li>
+    <li><strong>1 Bexiga urinária:</strong> armazena a urina (~400mL)</li>
+    <li><strong>1 Uretra:</strong> eliminação final</li>
+    <li>Unidade funcional = <strong>NÉFRON</strong> <span class="badge br">SEMPRE cai!</span></li>
+  </ul>
+</div>
+
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>⚙️ Funções Renais — Além de Filtrar</h4>
+  <ul>
+    <li>🩸 Manutenção da <strong>homeostase</strong>: controle do volume de líquidos e osmolaridade plasmática</li>
+    <li>⚖️ Regulação do <strong>equilíbrio ácido-base</strong> e eletrolítico (Na⁺, K⁺, Ca²⁺)</li>
+    <li>🗑️ Excreção de metabólitos e substâncias tóxicas (ureia, creatinina, fármacos)</li>
+    <li>🔴 Papel endócrino: regulação da <strong>pressão arterial</strong> (renina) · <strong>eritropoiese</strong> (eritropoietina) · metabolismo do cálcio (vitamina D ativa)</li>
+  </ul>
+</div>
+
+<!-- Néfron completo -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>🔬 Néfron — Estrutura Completa (do seu caderno!)</h4>
+  <div class="nefron-diagram">
+    <div class="nef-part" style="border-color:rgba(251,191,36,.3)">
+      <div class="np-title" style="color:var(--urfc)">⚪ Corpúsculo Renal</div>
+      <div class="np-desc"><strong>Glomérulo</strong> (rede de capilares) + <strong>Cápsula de Bowman</strong> → grande parte da filtração ocorre aqui</div>
+    </div>
+    <div class="nef-part" style="border-color:rgba(251,191,36,.3)">
+      <div class="np-title" style="color:var(--urfc)">🔵 Túbulo Contorcido Proximal (TCP)</div>
+      <div class="np-desc">Responsável pela <strong>reabsorção</strong> de 100% glicose e aminoácidos, 65% Na⁺ e H₂O</div>
+    </div>
+    <div class="nef-part" style="border-color:rgba(251,191,36,.3)">
+      <div class="np-title" style="color:var(--urfc)">🟡 Alça de Henle</div>
+      <div class="np-desc">Concentra a urina — <strong>reduz o volume</strong>. Descendente: reabsorve água. Ascendente: reabsorve sais</div>
+    </div>
+    <div class="nef-part" style="border-color:rgba(251,191,36,.3)">
+      <div class="np-title" style="color:var(--urfc)">🟠 Túbulo Contorcido Distal (TCD)</div>
+      <div class="np-desc">Reabsorção <strong>estimulada por hormônios</strong> (aldosterona, ADH)</div>
+    </div>
+    <div class="nef-part" style="border-color:rgba(251,191,36,.3)">
+      <div class="np-title" style="color:var(--urfc)">🔴 Túbulo / Ducto Coletor</div>
+      <div class="np-desc">Conduz a urina. Reabsorção final de água regulada por <strong>ADH</strong>. Secreção de resíduos.</div>
+    </div>
+    <div class="nef-part" style="border-color:rgba(251,191,36,.3)">
+      <div class="np-title" style="color:var(--moco)">🩸 Artéria → Glomérulo → Veia</div>
+      <div class="np-desc">Sangue entra pela artéria aferente, é filtrado no glomérulo, e o que sobra sai pela artéria eferente</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filtração Glomerular -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>🔬 Filtração Glomerular — TFG</h4>
+  <ul>
+    <li>Alta pressão hidrostática força o plasma a atravessar a membrana glomerular</li>
+    <li>Barra células e proteínas grandes por <strong>tamanho e carga</strong></li>
+    <li>Produz <strong>~180 L</strong> de filtrado por dia (ultrafiltrado do plasma)</li>
+    <li><strong>TFG = Taxa de Filtração Glomerular</strong> → indica o nível de funcionamento dos rins</li>
+    <li>TFG média ≈ <strong>125 mL/min</strong> (adulto saudável) <span class="badge br">valor cobrado!</span></li>
+    <li>Depende de: <strong>pressão hidrostática glomerular</strong> e <strong>pressão oncótica plasmática</strong></li>
+  </ul>
+  <div class="hbox"><strong>Volume final de urina ≈ 1–2 L/dia</strong> (de 180L filtrados → só 1–2L são eliminados!)<br>Composta por: água · ureia · creatinina · íons · ácidos orgânicos</div>
+</div>
+
+<!-- Formação da urina - 3 processos -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>⚗️ Formação da Urina — 3 Processos (do seu caderno!)</h4>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="fs-num">PROCESSO 1</div>
+      <div class="fs-title" style="color:var(--urfc)">Filtração Glomerular</div>
+      <div class="fs-desc">Alta pressão no glomérulo · barra proteínas e células · 180L/dia de filtrado</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="fs-num">PROCESSO 2</div>
+      <div class="fs-title" style="color:var(--urfc)">Reabsorção Tubular</div>
+      <div class="fs-desc">TCP: 100% glicose+aa · Alça de Henle: concentra urina · recupera o que é necessário</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="fs-num">PROCESSO 3</div>
+      <div class="fs-title" style="color:var(--urfc)">Secreção Tubular</div>
+      <div class="fs-desc">Ducto coletor: elimina amônia, fármacos · regulada por hormônios · ajuste final</div>
+    </div>
+  </div>
+  <div class="hbox" style="margin-top:12px">A urina é formada e pode ser concentrada. Os 3 processos (filtração, reabsorção e secreção) trabalham em sequência no néfron.</div>
+</div>
+
+<!-- Exames da Urina -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>🧪 Os 3 Tipos de Exame da Urina (EQU)</h4>
+  <div class="exam-tabs">
+    <div class="etab">
+      <div class="etab-icon">👁️</div>
+      <div class="etab-title" style="color:var(--urfc)">Exame Físico</div>
+      <div class="etab-desc">Análise macroscópica preliminar. Avalia: Cor · Aspecto · Volume · Odor · Densidade · Turbidez</div>
+    </div>
+    <div class="etab">
+      <div class="etab-icon">🧪</div>
+      <div class="etab-title" style="color:var(--urfc)">Exame Químico</div>
+      <div class="etab-desc">Tiras reagentes — reação colorimétrica mensurável. Detecta substâncias na urina (glicose, proteína, cetonas, bilirrubina...)</div>
+    </div>
+    <div class="etab">
+      <div class="etab-icon">🔬</div>
+      <div class="etab-title" style="color:var(--urfc)">Exame Microscópico</div>
+      <div class="etab-desc">Sedimentoscopia (microscopia). Analisa células, cilindros, bactérias, cristais no sedimento urinário</div>
+    </div>
+  </div>
+</div>
+
+<!-- Achados anormais -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>🟡 Análise — Normal vs Anormal</h4>
+  <ul>
+    <li>Normal: 95% água + 5% solutos · amarelo-citrino · pH 5–8</li>
+    <li><strong>🔴 Glicosúria →</strong> Diabetes (acima do limiar de reabsorção ~180mg/dL) ou falha renal proximal</li>
+    <li><strong>🔴 Proteinúria →</strong> dano à membrana glomerular (glomérulonefrite)</li>
+    <li><strong>🔴 Cetonúria →</strong> jejum prolongado, cetoacidose diabética</li>
+    <li><strong>🔴 Bilirrubinúria →</strong> sofrimento hepático / icterícia</li>
+    <li><strong>🔴 Hematúria →</strong> trauma, cálculos, infecção, neoplasia</li>
+  </ul>
+  <div class="hbox">⚠️ <strong>Cuidados com a amostra:</strong> identificação correta · tempo de transporte · temperatura de conservação. Coletas inadequadas falsificam resultados (crescimento bacteriano, lise celular, alterações de pH).</div>
+</div>
+
+<!-- Marcadores Renais — NOVOS DO CADERNO -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>📊 Marcadores de Função Renal (do seu caderno!)</h4>
+  <ul>
+    <li>São substâncias utilizadas para avaliar a função dos rins. Objetivos:</li>
+    <li>→ Avaliar a filtração glomerular · Detectar lesões renais · Monitorar doenças renais · Acompanhar tratamentos</li>
+  </ul>
+  <div class="marker-cards">
+    <div class="mc2" style="border-color:rgba(251,191,36,.3)">
+      <div class="mv" style="color:var(--urfc)">Ureia</div>
+      <div class="ml">10 – 50 mg/dL</div>
+      <div class="md">Formada do metabolismo das proteínas (degradação → amônio → ureia). ↑ ureia = <strong>Azotemia</strong></div>
+    </div>
+    <div class="mc2" style="border-color:rgba(251,191,36,.3)">
+      <div class="mv" style="color:var(--urfc)">Creatinina</div>
+      <div class="ml">Metabolismo muscular</div>
+      <div class="md">Produto do metabolismo muscular. Mais estável que a ureia. Melhor marcador isolado de função renal.</div>
+    </div>
+    <div class="mc2" style="border-color:rgba(251,191,36,.3)">
+      <div class="mv" style="color:var(--urfc)">TFG</div>
+      <div class="ml">~125 mL/min</div>
+      <div class="md">Taxa de Filtração Glomerular — indica o nível de funcionamento dos rins. Depende da pressão glomerular.</div>
+    </div>
+  </div>
+  <div class="hbox" style="margin-top:12px">⚠️ <strong>AZOTEMIA</strong> (↑ ureia) pode indicar: Insuficiência renal · Desidratação · Dieta rica em proteínas · Hemorragia intestinal</div>
+</div>
+
+<!-- Coleta -->
+<div class="tc" style="border-color:var(--urfc)">
+  <h4>🧪 Protocolos de Coleta — Do Caderno!</h4>
+  <ul>
+    <li><strong>Urina de rotina (random):</strong> qualquer horário</li>
+    <li><strong>1ª urina da manhã:</strong> padrão ouro — mais concentrada <span class="badge bg">EQU preferencial</span></li>
+    <li><strong>Micção média de fluxo (midstream / jato médio):</strong> descarta início e fim → elimina bactérias da uretra distal</li>
+    <li><strong>24 horas:</strong> descarta 1ª urina do período, coleta todas as demais</li>
+    <li><strong>Coleta por sonda/cateterismo:</strong> quando indicada (suspeita grave de infecção)</li>
+    <li><strong>Processar em ATÉ 2h</strong> ou refrigerar <span class="badge br">após 2h: bactérias proliferam!</span></li>
+  </ul>
+</div>
+
+</div><!-- end topic-grid -->
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ FLASHCARDS ══ -->
+<section class="sec" id="flash">
+<div class="wrap">
+<div class="sec-label">Treinamento Ativo</div>
+<div class="sec-title">🃏 Flashcards — Clique para virar!</div>
+<p class="sec-sub">Tente responder antes de ver. 18 cards cobrindo os pontos mais críticos.</p>
+<div class="fc-grid" id="fcgrid"></div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══ CHEAT SHEET ══ -->
+<section class="sec" id="cheat">
+<div class="wrap">
+<div class="sec-label">Cola Rápida</div>
+<div class="sec-title">⚡ Macetes — Gravar antes de dormir</div>
+<p class="sec-sub">As associações mais cobráveis das suas provas. Releia tudo antes de fechar os olhos. 🌙</p>
+
+<div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--moco);margin-bottom:10px;margin-top:8px">🔬 MOCO + BIOQ</div>
+<div class="cheat-grid">
+  <div class="ci"><div class="lbl">Glicólise — saldo</div><div class="val">2 ATP <span>(−2+4)</span></div></div>
+  <div class="ci"><div class="lbl">Enzima reguladora glicólise</div><div class="val">PFK-1 <span>(fase investimento)</span></div></div>
+  <div class="ci"><div class="lbl">Local da Glicólise</div><div class="val">Citosol <span>(NÃO mitocôndria!)</span></div></div>
+  <div class="ci"><div class="lbl">Glicólise — regulação hormonal</div><div class="val">Insulina=ATIVA · Glucagon=INIBE</div></div>
+  <div class="ci"><div class="lbl">Lactose = ?</div><div class="val">Glicose + Galactose <span>(cai muito!)</span></div></div>
+  <div class="ci"><div class="lbl">Rostral = ?</div><div class="val">Direção ao nariz <span>(só na cabeça!)</span></div></div>
+</div>
+
+<div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--pgco);margin-bottom:10px;margin-top:20px">🧫 PGCO — Patologia Geral (da sua prova!)</div>
+<div class="cheat-grid">
+  <div class="ci"><div class="lbl">Necrose vs Apoptose</div><div class="val">Necrose=INFLAMA (suja) · Apoptose=NÃO inflama (limpa)</div></div>
+  <div class="ci"><div class="lbl">Necrose — mecanismo</div><div class="val">Digestão enzimática + extravasamento celular</div></div>
+  <div class="ci"><div class="lbl">Apoptose — mecanismo</div><div class="val">Caspases + fragmentação ORDENADA do DNA</div></div>
+  <div class="ci"><div class="lbl">Infarto cerebral — necrose</div><div class="val">LIQUEFATIVA <span>(cérebro é especial!)</span></div></div>
+  <div class="ci"><div class="lbl">Infarto cardíaco — necrose</div><div class="val">COAGULATIVA <span>(padrão geral)</span></div></div>
+  <div class="ci"><div class="lbl">Hipóxia celular → consequência imediata</div><div class="val">Falha bomba Na⁺/K⁺ → EDEMA celular</div></div>
+  <div class="ci"><div class="lbl">Tumefação + vacuolização</div><div class="val">Dano REVERSÍVEL <span>(ainda dá pra salvar)</span></div></div>
+  <div class="ci"><div class="lbl">Hipertrofia vs Hiperplasia</div><div class="val">Hipertrofia=↑ TAMANHO · Hiperplasia=↑ NÚMERO</div></div>
+  <div class="ci"><div class="lbl">Metaplasia escamosa (fumante)</div><div class="val">→ Displasia → Neoplasia <span>(risco aumentado!)</span></div></div>
+  <div class="ci"><div class="lbl">1º evento da inflamação aguda</div><div class="val">Vasodilatação + ↑ fluxo sanguíneo</div></div>
+  <div class="ci"><div class="lbl">Diapedese — depende de</div><div class="val">Moléculas de ADESÃO leucocitária</div></div>
+  <div class="ci"><div class="lbl">Neutrófilos → infecção bacteriana</div><div class="val">Inflamação aguda SUPURATIVA</div></div>
+  <div class="ci"><div class="lbl">5 sinais da inflamação</div><div class="val">Calor · Rubor · Tumor · Dor · Perda de Função</div></div>
+  <div class="ci"><div class="lbl">Resolução completa da inflamação</div><div class="val">Eliminar agente + regeneração tecidual</div></div>
+</div>
+
+<div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--anpa);margin-bottom:10px;margin-top:20px">🔪 ANPA — Anatomia Patológica (da sua prova!)</div>
+<div class="cheat-grid">
+  <div class="ci"><div class="lbl">HE — núcleo</div><div class="val">ROXO/AZUL <span>(Hematoxilina)</span></div></div>
+  <div class="ci"><div class="lbl">HE — citoplasma</div><div class="val">ROSA <span>(Eosina)</span></div></div>
+  <div class="ci"><div class="lbl">Fixação histológica — MAIS CRÍTICA</div><div class="val">Formol 10% <span>(para autólise imediatamente!)</span></div></div>
+  <div class="ci"><div class="lbl">Fixação Papanicolau</div><div class="val">Álcool 95% <span>(citologia)</span></div></div>
+  <div class="ci"><div class="lbl">Papanicolau — corantes</div><div class="val">Fast blue + Eosina amarelada + Hematoxilina</div></div>
+  <div class="ci"><div class="lbl">HPV — subtipos oncogênicos</div><div class="val">16 e 18 <span>(+ relacionados ao câncer)</span></div></div>
+  <div class="ci"><div class="lbl">Coilocitose = PATOGNOMÔNICO de</div><div class="val">HPV <span>(halo perinuclear + núcleo deslocado)</span></div></div>
+  <div class="ci"><div class="lbl">Preventivo — região a coletar</div><div class="val">Mucosa ECTOCERVICAL <span>(junção escamocolunar)</span></div></div>
+  <div class="ci"><div class="lbl">Células por raspado servem para</div><div class="val">Imunocitoquímica + hibridização in situ</div></div>
+  <div class="ci"><div class="lbl">Criostato — EPI obrigatório</div><div class="val">Máscara com FILTRO para vapores orgânicos</div></div>
+  <div class="ci"><div class="lbl">Fixação ruim → consequência</div><div class="val">Compromete integridade celular + análise diagnóstica</div></div>
+  <div class="ci"><div class="lbl">Lâmina com excesso de material</div><div class="val">Sobreposição celular <span>(resultado inválido!)</span></div></div>
+  <div class="ci"><div class="lbl">Corantes acidófilos</div><div class="val">Coram CITOPLASMA <span>(caráter básico → tons róseos)</span></div></div>
+</div>
+
+<div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--cqlab);margin-bottom:10px;margin-top:20px">📋 CQLAB — Controle de Qualidade (dos seus cadernos!)</div>
+<div class="cheat-grid">
+  <div class="ci"><div class="lbl">Falhas laboratoriais</div><div class="val">70% PRÉ-ANALÍTICA</div></div>
+  <div class="ci"><div class="lbl">ISO/IEC 17025 — foco</div><div class="val">Resultados ANALÍTICOS confiáveis <span>(labs clínicos/industriais)</span></div></div>
+  <div class="ci"><div class="lbl">BPL / GLP — foco</div><div class="val">Estudos NÃO CLÍNICOS <span>(toxicologia, farmácia)</span></div></div>
+  <div class="ci"><div class="lbl">SGQ</div><div class="val">Sistema de Gestão de Qualidade <span>(políticas + processos)</span></div></div>
+  <div class="ci"><div class="lbl">POP — objetivo</div><div class="val">Reprodutibilidade independente do executor</div></div>
+  <div class="ci"><div class="lbl">Risco ergonômico — ex</div><div class="val">Movimento REPETITIVO <span>(afeta psicofisiologia)</span></div></div>
+</div>
+
+<div style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--hema);margin-bottom:10px;margin-top:20px">🩸 HEMA + 🦠 MIVB + 💧 URFC</div>
+<div class="cheat-grid">
+  <div class="ci"><div class="lbl">Tubo ROXO</div><div class="val">EDTA → Hemograma</div></div>
+  <div class="ci"><div class="lbl">Tubo AZUL</div><div class="val">Citrato → Coagulação</div></div>
+  <div class="ci"><div class="lbl">Desvio à Esquerda</div><div class="val">Infecção bacteriana GRAVE / sepse</div></div>
+  <div class="ci"><div class="lbl">Linfocitose</div><div class="val">Infecção VIRAL</div></div>
+  <div class="ci"><div class="lbl">Eosinofilia</div><div class="val">Alergia ou parasitose</div></div>
+  <div class="ci"><div class="lbl">Alvo dos antibióticos</div><div class="val">Peptideoglicano <span>(parede bacteriana)</span></div></div>
+  <div class="ci"><div class="lbl">Unidade funcional do rim</div><div class="val">NÉFRON <span>(~1 milhão/rim)</span></div></div>
+  <div class="ci"><div class="lbl">TFG normal</div><div class="val">~125 mL/min · filtrado = 180L/dia</div></div>
+  <div class="ci"><div class="lbl">Volume final de urina</div><div class="val">1–2 L/dia</div></div>
+  <div class="ci"><div class="lbl">Ureia — ref. normal</div><div class="val">10–50 mg/dL → ↑ = AZOTEMIA</div></div>
+  <div class="ci"><div class="lbl">Creatinina vem de</div><div class="val">Metabolismo muscular <span>(marcador mais estável)</span></div></div>
+  <div class="ci"><div class="lbl">Coleta urina — padrão ouro</div><div class="val">1ª manhã + jato médio · processar em 2h</div></div>
+</div>
+
+<div class="review-box">
+  <h3>🎯 O que DEFINITIVAMENTE vai cair — baseado nas suas provas!</h3>
+  <ul class="rl">
+    <li>🧫 <strong>PGCO:</strong> Necrose ≠ Apoptose — Necrose INFLAMA (rompe membrana, digestão enzimática) · Apoptose NÃO inflama (caspases, DNA fragmentado de forma ordenada, corpos apoptóticos)</li>
+    <li>🧫 <strong>PGCO:</strong> Infarto CEREBRAL = necrose LIQUEFATIVA (o cérebro derrete!) · Infarto cardíaco = necrose COAGULATIVA</li>
+    <li>🧫 <strong>PGCO:</strong> Hipóxia → ↓ ATP → falha da bomba Na⁺/K⁺ → entrada de Na⁺ e água → EDEMA CELULAR</li>
+    <li>🧫 <strong>PGCO:</strong> Hipertrofia = ↑ TAMANHO (sem divisão) · Hiperplasia = ↑ NÚMERO (proliferação celular induzida)</li>
+    <li>🧫 <strong>PGCO:</strong> 1º evento da inflamação aguda = Vasodilatação com aumento do fluxo sanguíneo</li>
+    <li>🧫 <strong>PGCO:</strong> Diapedese depende de moléculas de ADESÃO · Infiltrado neutrofílico transmural = inflamação aguda supurativa</li>
+    <li>🔪 <strong>ANPA:</strong> HPV subtipos 16 e 18 = os mais oncogênicos (mais relacionados ao câncer do colo do útero)</li>
+    <li>🔪 <strong>ANPA:</strong> Papanicolau = Fast blue + Eosina amarelada + Hematoxilina · Fixação = Álcool 95%</li>
+    <li>🔪 <strong>ANPA:</strong> Preventivo ginecológico → coletar a mucosa ECTOCERVICAL (junção escamocolunar)</li>
+    <li>🔪 <strong>ANPA:</strong> Coilocitose = halo perinuclear claro + núcleo hipercromático deslocado = PATOGNOMÔNICO do HPV</li>
+    <li>🔪 <strong>ANPA:</strong> Fixação histológica mais crítica = Formol 10% (imediata, para a autólise do tecido!)</li>
+    <li>📋 <strong>CQLAB:</strong> ISO/IEC 17025 → labs clínicos/industriais (competência técnica + resultados confiáveis) · BPL/GLP → estudos não clínicos (toxicologia, farmácia)</li>
+    <li>📋 <strong>CQLAB:</strong> 70% das falhas laboratoriais ocorrem na Fase PRÉ-Analítica (cadastro errado, jejum, tubo errado, identificação)</li>
+    <li>⚡ <strong>BIOQ:</strong> Saldo da glicólise = 2 ATP líquidos — no CITOSOL, não na mitocôndria! · Enzima-chave = PFK-1</li>
+    <li>🩸 <strong>HEMA:</strong> Tubo Roxo (EDTA)=Hemograma · Tubo Azul (Citrato)=Coagulação — inverter invalida o resultado!</li>
+    <li>💧 <strong>URFC:</strong> NÉFRON = unidade funcional · TFG ≈ 125 mL/min · 180L filtrado/dia · 1–2L urina final · Ureia 10–50 mg/dL · ↑ = Azotemia</li>
+  </ul>
+</div>
+</div>
+</section>
+
+<footer>
+  <div class="footer-glow"></div>
+  ⚗️ Trimestral — Análises Clínicas &nbsp;·&nbsp; Cadernos integrados &nbsp;·&nbsp; Boa prova! 🍀<br>
+  <span style="opacity:.4;margin-top:6px;display:inline-block;font-size:10px">você estudou, você sabe — vai bem.</span>
+</footer>
+
+<script>
+/* FLASHCARDS */
+const cards=[
+  {q:"Qual o SALDO LÍQUIDO de ATP da Glicólise e onde ocorre?",a:"2 ATP líquidos (−2 na fase de investimento, +4 na compensação). Ocorre no CITOSOL — não na mitocôndria!",c:"var(--bioq)"},
+  {q:"Qual é a enzima REGULADORA PRINCIPAL da glicólise?",a:"PFK-1 (Fosfofrutoquinase-1) — controla a fase de investimento (reações 1–5). É o principal ponto de controle da via glicolítica.",c:"var(--bioq)"},
+  {q:"Qual a diferença fundamental entre NECROSE e APOPTOSE?",a:"NECROSE = 'suja': rompe membrana → inflamação severa. APOPTOSE = 'limpa': programada, forma corpos apoptóticos, SEM inflamação.",c:"var(--pgco)"},
+  {q:"Quais são os 5 sinais cardinais da inflamação?",a:"Calor · Rubor · Tumor (edema) · Dor · Perda de Função. Aguda=Neutrófilos; Crônica=Macrófagos+Linfócitos+Granulomas.",c:"var(--pgco)"},
+  {q:"Na HE, qual cor fica o NÚCLEO e qual cor fica o CITOPLASMA?",a:"NÚCLEO = ROXO/AZUL (Hematoxilina). CITOPLASMA = ROSA/VERMELHO (Eosina).",c:"var(--anpa)"},
+  {q:"Qual o efeito citopático PATOGNOMÔNICO do HPV?",a:"COILOCITOSE — halo perinuclear claro + núcleo deslocado, hipercromático e irregular. É o sinal diagnóstico específico do HPV.",c:"var(--anpa)"},
+  {q:"Tubo ROXO vs Tubo AZUL — para que serve cada um?",a:"Tubo ROXO (EDTA) → Hemograma. Tubo AZUL (Citrato) → Coagulação (PT, APTT). Inverter = resultado inválido!",c:"var(--hema)"},
+  {q:"O que significa 'Desvio à Esquerda' no leucograma?",a:"Liberação de BASTÕES (neutrófilos jovens imaturos) da medula para o sangue periférico → infecção bacteriana GRAVE ou sepse.",c:"var(--hema)"},
+  {q:"Qual % das falhas laboratoriais ocorre na Fase Pré-Analítica?",a:"70%! Exemplos: cadastro errado, jejum inadequado, tubo errado, identificação incorreta, transporte inadequado.",c:"var(--cqlab)"},
+  {q:"O que é NÉFRON e quantos existem em cada rim?",a:"NÉFRON é a unidade funcional do rim. Cada rim contém cerca de 1 MILHÃO de néfrons responsáveis pela filtração, reabsorção e secreção.",c:"var(--urfc)"},
+  {q:"O que é TFG e qual é o valor normal?",a:"TFG = Taxa de Filtração Glomerular — indica o nível de funcionamento dos rins. Valor normal ≈ 125 mL/min no adulto saudável. Depende da pressão hidrostática glomerular.",c:"var(--urfc)"},
+  {q:"Quais são os 3 processos de formação da urina?",a:"(1) Filtração Glomerular: 180L/dia, barra proteínas/células. (2) Reabsorção Tubular: TCP=100% glicose+aa; Alça de Henle=concentra. (3) Secreção Tubular: elimina resíduos no ducto coletor.",c:"var(--urfc)"},
+  {q:"O que indica Glicosúria, Proteinúria, Cetonúria e Azotemia?",a:"Glicosúria=Diabetes. Proteinúria=dano glomerular. Cetonúria=jejum severo/cetoacidose. Azotemia (↑ureia)=insuficiência renal, desidratação, dieta rica em proteínas.",c:"var(--urfc)"},
+  {q:"Qual é o valor de referência da UREIA e o que significa sua elevação?",a:"Ureia normal: 10–50 mg/dL. Elevação = AZOTEMIA. Causas: insuficiência renal, desidratação, dieta rica em proteínas, hemorragia intestinal.",c:"var(--urfc)"},
+  {q:"Qual o alvo principal dos antibióticos nas bactérias?",a:"A PAREDE CELULAR de Peptideoglicano — exclusiva de procariotos. Células humanas não têm, então antibióticos atacam bactérias sem prejudicar o hospedeiro.",c:"var(--mivb)"},
+  {q:"Qual a etapa MAIS CRÍTICA do processamento histológico e por quê?",a:"FIXAÇÃO com Formol 10% — deve ser imediata para parar a autólise (autodigestão do tecido). Tecido mal fixado = diagnóstico impossível.",c:"var(--anpa)"},
+  {q:"Quais são os 3 tipos de exame de urina (EQU)?",a:"(1) Físico: cor, aspecto, volume, odor, densidade. (2) Químico: tiras reagentes (glicose, proteína, cetonas...). (3) Microscópico: sedimentoscopia — analisa células, cilindros, bactérias.",c:"var(--urfc)"},
+  {q:"Qual a coleta padrão de urina e qual o prazo para processamento?",a:"1ª urina da manhã + técnica do jato médio (descarta o início). Processar em ATÉ 2 HORAS ou refrigerar — após isso: bactérias proliferam e falsificam resultados.",c:"var(--urfc)"},
+];
+
+const grid=document.getElementById('fcgrid');
+cards.forEach(c=>{
+  const w=document.createElement('div');
+  w.className='fc-wrap';
+  w.innerHTML=`<div class="fc" onclick="this.classList.toggle('flipped')">
+    <div class="fc-front" style="border-color:${c.c}">
+      <div class="fc-q" style="color:${c.c}">${c.q}</div>
+      <div class="fc-hint">toque para ver a resposta</div>
+    </div>
+    <div class="fc-back" style="border-color:${c.c}">
+      <div class="fc-a">${c.a}</div>
+      <div class="fc-hint" style="color:${c.c}">✓ resposta</div>
+    </div>
+  </div>`;
+  grid.appendChild(w);
+});
+
+/* ACCORDION */
+function toggleMC(head){head.closest('.mega-card').classList.toggle('mc-open')}
+
+/* PROGRESS BAR */
+window.addEventListener('scroll',()=>{
+  const e=document.documentElement;
+  document.getElementById('prog').style.width=(e.scrollTop/(e.scrollHeight-e.clientHeight)*100)+'%';
+  document.getElementById('btt').classList.toggle('show',e.scrollTop>400);
+},{passive:true});
+
+/* INTERSECTION OBSERVER */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('vis'),60);io.unobserve(e.target);}});
+},{threshold:0.07});
+function obsAll(sel,d=0.07){document.querySelectorAll(sel).forEach((el,i)=>{el.style.transitionDelay=(i*d)+'s';io.observe(el);})}
+obsAll('.mega-card',0.07);
+obsAll('.sc',0.07);
+obsAll('.tc',0.06);
+obsAll('.ci',0.04);
+obsAll('.rl li',0.05);
+
+/* COUNTERS */
+const cio=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target,target=+el.dataset.target;
+    let cur=0;const step=Math.ceil(target/28);
+    const t=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur;if(cur>=target)clearInterval(t);},38);
+    cio.unobserve(el);
+  });
+},{threshold:0.5});
+document.querySelectorAll('[data-target]').forEach(el=>cio.observe(el));
+
+/* PARTICLES */
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H;
+const resize=()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight};
+resize();window.addEventListener('resize',resize,{passive:true});
+const cols=['rgba(0,212,255,','rgba(124,58,237,','rgba(244,63,142,','rgba(16,212,142,','rgba(251,191,36,'];
+const pts=Array.from({length:60},()=>({
+  x:Math.random()*1920,y:Math.random()*1080,
+  vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,
+  r:Math.random()*1.4+.4,
+  col:cols[Math.floor(Math.random()*cols.length)],
+  a:Math.random()*.32+.08
+}));
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<pts.length;i++){
+    const p=pts[i];
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.col+p.a+')';ctx.fill();
+    for(let j=i+1;j<pts.length;j++){
+      const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=dx*dx+dy*dy;
+      if(d<12000){
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+        ctx.strokeStyle='rgba(0,212,255,'+(0.06*(1-d/12000))+')';
+        ctx.lineWidth=.5;ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ACTIVE NAV */
+const secs=document.querySelectorAll('[id]'),nbs=document.querySelectorAll('.nb');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  secs.forEach(s=>{if(window.scrollY>=s.offsetTop-80)cur=s.id;});
+  nbs.forEach(n=>{n.classList.toggle('active',n.getAttribute('href')==='#'+cur);});
+},{passive:true});
+</script>
+</body>
+</html>
